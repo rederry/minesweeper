@@ -1,13 +1,14 @@
 /* Copyright (c) 2007-2017 MIT 6.005 course staff, all rights reserved.
  * Redistribution of original or derived work requires permission of course staff.
  */
-// package minesweeper.server;
+package minesweeper.server;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
-// import minesweeper.Board;
+import minesweeper.Board;
 
+// import minesweeper.Board;
 
 /**
  * Multiplayer Minesweeper server.
@@ -33,13 +34,16 @@ public class MinesweeperServer {
     private final ServerSocket serverSocket;
     /** True if the server should *not* disconnect a client after a BOOM message. */
     private final boolean debug;
+    
+    /** Client count **/
+    private static int count = 0;
 
-    // TODO: Abstraction function, rep invariant, rep exposure
     // Abstraction function: 
     //      Represent a minesweeperServer can maintain multiple client connections simultaneously to paly the minesweeper game.
     
     // Rep invariant:
     //       socket != null
+    //       player >= 0
     
     // Rep exposure
     //      All fields are private and can not be modified;
@@ -73,6 +77,7 @@ public class MinesweeperServer {
          * @param client socket
          */
         public MinesweeperServerThread(Socket socket) {
+            MinesweeperServer.count++;
             this.socket = socket;
         }
         
@@ -90,6 +95,8 @@ public class MinesweeperServer {
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                count--;
             }
           }
         }
@@ -128,7 +135,7 @@ public class MinesweeperServer {
     private void handleConnection(Socket socket) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        out.println("Welcome to Minesweeper. Players: \" N \" including you. Board: \" X \" columns by \" Y \" rows. Type 'help' for help.");
+        out.println(hello());
         try {
             for (String line = in.readLine(); line != null; line = in.readLine()) {
                 String output = handleRequest(line);
@@ -154,7 +161,7 @@ public class MinesweeperServer {
      * @return message to client, or null if none
      */
     private String handleRequest(String input) {
-        String regex = "(look)|(help)|(bye)|"
+        String regex = "(look)|(help)|(bye)|(hello)|"
                      + "(dig -?\\d+ -?\\d+)|(flag -?\\d+ -?\\d+)|(deflag -?\\d+ -?\\d+)";
         if ( ! input.matches(regex)) {
             // invalid input
@@ -174,6 +181,8 @@ public class MinesweeperServer {
         } else if (tokens[0].equals("bye")) {
             // 'bye' request
             return TERMINATED_SIGNAL;
+        } else if (tokens[0].equals("hello")) {
+            return hello();
         } else {
             int x = Integer.parseInt(tokens[1]);
             int y = Integer.parseInt(tokens[2]);
@@ -196,8 +205,13 @@ public class MinesweeperServer {
                 return board.lookBoard();
             }
         }
-        // TODO: Should never get here, make sure to return in each of the cases above
         throw new UnsupportedOperationException();
+    }
+    
+    /** Return the hello message */
+    private String hello() {
+        return "Welcome to Minesweeper. Players : " + count + " including you. Board: "
+                + board.getColNum() + " columns by " + board.getRowNum() + " rows. Type 'help' for help.";
     }
 
     /**

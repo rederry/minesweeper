@@ -1,4 +1,4 @@
-// package minesweeper;
+package minesweeper;
 
 public class Square {
     
@@ -12,8 +12,6 @@ public class Square {
     private int adjacentBoomCount;
     private final int x;
     private final int y;
-    
-    // TODO: Abstraction function, rep invariant, rep exposure, thread safety
     
     // Abstraction function: 
     //      Represent a square of a minesweeper board

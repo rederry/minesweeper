@@ -1,7 +1,7 @@
 /* Copyright (c) 2007-2017 MIT 6.005 course staff, all rights reserved.
  * Redistribution of original or derived work requires permission of course staff.
  */
-// package minesweeper;
+package minesweeper;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -52,7 +52,6 @@ public class Board {
         this.m = Integer.parseInt(line.split(" ")[0]);
         this.n = Integer.parseInt(line.split(" ")[1]);
         board = new Square[n][m];
-//        System.out.println("n:" + n + " m:" + m);
         for (int i = 0; i < n; i++) {
             String[] tokens = in.readLine().split(" ");
             for (int j = 0; j < m; j++) {
@@ -63,52 +62,14 @@ public class Board {
         in.close();
     }
     
-    /**
-     * Test whether the (x, y) in the board
-     * @param x
-     * @param y
-     * @return true if in bound
-     */
-    private boolean inBound(int x, int y) {
-        return x < n && y < m && x >= 0 && y >= 0;
+    /** Getters */
+    public int getRowNum() {
+        return n;
     }
     
-    /**
-     * Indicating how many adjacent squares contain mines,
-     * if no mines are adjacent, the square becomes blank, and all adjacent squares will be recursively revealed.
-     * @param square in the board
-     */
-    private void revealAdjacentBoom(Square square) {
-        int boomCount = 0;
-        ArrayList<Square>  neighbours = adjacentSquares(square);
-        for (Square s : neighbours) 
-            if (s.containBoom()) boomCount++;
-        square.setDug();
-        square.setAdjacentBoomCount(boomCount);
-        if (boomCount != 0) return;
-        for (Square s : neighbours) {  
-            if(s.isUntouched()) revealAdjacentBoom(s);
-        }
+    public int getColNum() {
+        return m;
     }
-    
-    /**
-     * Find all adjacent squares around this square.
-     * @param square
-     * @return all adjacent squares around this square
-     */
-    private ArrayList<Square> adjacentSquares(Square square) {
-        ArrayList<Square>  neighbours = new ArrayList<Square>();
-        int x = square.getX();
-        int y = square.getY();
-        for (int i = -1; i < 2; i++) {
-            for (int j = -1; j < 2; j++) {
-                if (inBound(x + i, y + j))
-                    neighbours.add(board[x+i][y+j]);
-            }
-        }
-        return neighbours;
-    }
-    
     
     /**
      * Dig at x col y row, 
@@ -180,37 +141,37 @@ public class Board {
      * Print the current board
      */
     public synchronized String lookBoard() {
-//        String s = "   ";
-//        for (int k = 0; k < m; k++) { 
-//            s += String.format("%3d", k);
-//        }
-//        s += "\n";
-//        for (int i = 0; i < n; i++) {
-//            s += String.format("%3d ", i);
-//            for (int j = 0; j < m; j++) {
-//                Square square = board[i][j];
-//                if (square.isUntouched()) s += " -";
-//                else if (square.isFlagged()) s += " F";
-//                else if (square.adjacentBoomCount() == 0) s += " O";
-//                else s += " " + square.adjacentBoomCount();
-//                s += " ";
-//            }            
-//            s += "\n";
-//        }
-//        return s;
-        String s = "";
+        String s = "   ";
+        for (int k = 0; k < m; k++) { 
+            s += String.format("%3d", k);
+        }
+        s += "\n";
         for (int i = 0; i < n; i++) {
+            s += String.format("%3d ", i);
             for (int j = 0; j < m; j++) {
                 Square square = board[i][j];
-                if (square.isUntouched()) s += "-";
-                else if (square.isFlagged()) s += "F";
-                else if (square.adjacentBoomCount() == 0) s += " ";
-                else s += square.adjacentBoomCount();
-                if (j != m - 1) s += " ";
+                if (square.isUntouched()) s += " -";
+                else if (square.isFlagged()) s += " F";
+                else if (square.adjacentBoomCount() == 0) s += "  ";
+                else s += " " + square.adjacentBoomCount();
+                s += " ";
             }            
-            if (i != n - 1) s += "\n";
+            s += "\n";
         }
         return s;
+//        String s = "";
+//        for (int i = 0; i < n; i++) {
+//            for (int j = 0; j < m; j++) {
+//                Square square = board[i][j];
+//                if (square.isUntouched()) s += "-";
+//                else if (square.isFlagged()) s += "F";
+//                else if (square.adjacentBoomCount() == 0) s += " ";
+//                else s += square.adjacentBoomCount();
+//                if (j != m - 1) s += " ";
+//            }            
+//            if (i != n - 1) s += "\n";
+//        }
+//        return s;
     }
     
     @Override
@@ -234,6 +195,50 @@ public class Board {
       return s;
     }
     
-    // TODO: Specify, test, and implement in problem 2
+    /**
+     * Test whether the (x, y) in the board
+     * @param x
+     * @param y
+     * @return true if in bound
+     */
+    private boolean inBound(int x, int y) {
+        return x < n && y < m && x >= 0 && y >= 0;
+    }
+    
+    /**
+     * Indicating how many adjacent squares contain mines,
+     * if no mines are adjacent, the square becomes blank, and all adjacent squares will be recursively revealed.
+     * @param square in the board
+     */
+    private void revealAdjacentBoom(Square square) {
+        int boomCount = 0;
+        ArrayList<Square>  neighbours = adjacentSquares(square);
+        for (Square s : neighbours) 
+            if (s.containBoom()) boomCount++;
+        square.setDug();
+        square.setAdjacentBoomCount(boomCount);
+        if (boomCount != 0) return;
+        for (Square s : neighbours) {  
+            if(s.isUntouched()) revealAdjacentBoom(s);
+        }
+    }
+    
+    /**
+     * Find all adjacent squares around this square.
+     * @param square
+     * @return all adjacent squares around this square
+     */
+    private ArrayList<Square> adjacentSquares(Square square) {
+        ArrayList<Square>  neighbours = new ArrayList<Square>();
+        int x = square.getX();
+        int y = square.getY();
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+                if (inBound(x + i, y + j))
+                    neighbours.add(board[x+i][y+j]);
+            }
+        }
+        return neighbours;
+    }
     
 }
