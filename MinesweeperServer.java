@@ -1,14 +1,11 @@
 /* Copyright (c) 2007-2017 MIT 6.005 course staff, all rights reserved.
  * Redistribution of original or derived work requires permission of course staff.
  */
-package minesweeper.server;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import minesweeper.Board;
-
-// import minesweeper.Board;
 
 /**
  * Multiplayer Minesweeper server.

@@ -1,7 +1,6 @@
 /* Copyright (c) 2007-2017 MIT 6.005 course staff, all rights reserved.
  * Redistribution of original or derived work requires permission of course staff.
  */
-package minesweeper;
 
 import java.io.BufferedReader;
 import java.io.File;
